@@ -1,5 +1,5 @@
 Écriture automate
 =================
 
-Art project by Alexandre Castonguay.
+Software for an art project by Alexandre Castonguay.
 
