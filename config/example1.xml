@@ -1,5 +1,5 @@
 <writer>
-    <text>inspiration/memoire_quessy.txt</text>
+    <text>config/memoire_quessy.txt</text>
     <num_characters_per_line>70</num_characters_per_line>
     <num_lines>24</num_lines>
 </writer>
