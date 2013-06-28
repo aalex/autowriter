@@ -1,0 +1,2 @@
+#!/bin/bash
+./scripts/autowriter config/example1.xml
