@@ -11,7 +11,7 @@ import nltk
 #import re
 #import pprint
 
-FILE_NAME = "pg43038.txt"
+FILE_NAME = "source_pg43038.txt"
 
 def hello(length=100):
     raw = open(FILE_NAME, "rU").read()
