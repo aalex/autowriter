@@ -36,6 +36,11 @@ class Application(object):
         reactor.listenTCP(web_port, self._web_factory)
 
     def generate_text(self):
-        text = self._text_generator.generate(self.config.length)
-        return textutils.crop_text(text, self.config.length)
+        lines = self.config.num_lines
+        chars = self.config.num_characters_per_line
+        CHAR_PER_WORD = 4
+        words = lines * chars / CHAR_PER_WORD
+
+        text = self._text_generator.generate(words)
+        return textutils.crop_text(text, lines, chars)
 

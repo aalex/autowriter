@@ -24,7 +24,8 @@ class Configuration(object):
         # List of text files to get inspired from
         self.text_files = []
         # Length of the text to generate
-        self.length = 100
+        self.num_lines = 24
+        self.num_characters_per_line = 70
 
         # Populate them
         self._parse(config_file)
@@ -35,5 +36,6 @@ class Configuration(object):
 
         # TODO: load more than one text file
         self.text_files.append(get_text(root.getElementsByTagName("text")[0].childNodes))
-        self.length = int(get_text(root.getElementsByTagName("length")[0].childNodes))
+        self.num_lines = int(get_text(root.getElementsByTagName("num_lines")[0].childNodes))
+        self.num_characters_per_line = int(get_text(root.getElementsByTagName("num_characters_per_line")[0].childNodes))
 

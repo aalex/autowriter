@@ -35,9 +35,10 @@ def wrap_text(text, num_lines, characters_per_line):
         i = i + 1
     return result
 
-def crop_text(text, num_words):
-    # TODO: remove before after first period
-    # TODO: remove after last period
-    result = wrap_text(text, 10, 70)
-    return result
+def crop_text(text, num_lines, num_chars_per_line):
+    text = remove_before_first_period(text)
+    text = wrap_text(text, num_lines, num_chars_per_line)
+    text = remove_after_last_period(text)
+    text = wrap_text(text, num_lines, num_chars_per_line)
+    return text
 
