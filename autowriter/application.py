@@ -10,6 +10,7 @@ from twisted.web.server import Site
 from autowriter import configuration
 from autowriter import webwriterpage
 from autowriter import markovgenerator
+from autowriter import textutils
 import textwrap
 
 class Application(object):
@@ -36,9 +37,5 @@ class Application(object):
 
     def generate_text(self):
         text = self._text_generator.generate(self.config.length)
-        lines = textwrap.wrap(text, 70)
-        result = ""
-        for line in lines:
-            result = result + line + "\n"
-        return result
+        return textutils.crop_text(text, self.config.length)
 

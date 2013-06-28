@@ -21,13 +21,20 @@ class WebWriterPage(Resource):
             <title>autowriter</title>
             <meta http-equiv="content-type" content="text/html; charset=utf-8" />
             <style type="text/css">
+            h1 {
+                font: 24px bold arial;
+            }
             body {
                 font: 16px arial, sans-serif;
-                color: #300;
-                background-color: #ccf;
+                color: #ccc;
+                background-color: #000;
+            }
+            pre {
+                border: 1px #fff;
             }
             </style>
             <body>
+                <h1>autowriter</h1>
                 <pre>%s</pre>
             </body>
             </html>""" % (text)
