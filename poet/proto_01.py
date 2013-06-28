@@ -13,7 +13,7 @@ import nltk
 
 FILE_NAME = "source_pg43038.txt"
 
-def hello(length=100):
+def hello(length=1000):
     raw = open(FILE_NAME, "rU").read()
     tokens = nltk.word_tokenize(raw)
     text = nltk.Text(tokens)

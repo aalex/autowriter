@@ -12,7 +12,8 @@ But I got this::
   KeyError: ('THE', 'END')
 """
 import random
-FILE_NAME = "source_pg43038.txt"
+#FILE_NAME = "source_pg43038.txt"
+FILE_NAME = "memoire_quessy.txt"
 
 class Markov(object):
     def __init__(self, open_file):
@@ -63,6 +64,6 @@ class Markov(object):
 if __name__ == "__main__":
     _file = open(FILE_NAME, "rU")
     markov_gen = Markov(_file)
-    text = markov_gen.generate_markov_text(100)
+    text = markov_gen.generate_markov_text(1000)
     print(text)
 
