@@ -23,8 +23,8 @@ class WebWriterPage(Resource):
             <style type="text/css">
             body {
                 font: 16px arial, sans-serif;
-                color: #333;
-                background-color: #ccc;
+                color: #300;
+                background-color: #ccf;
             }
             </style>
             <body>
