@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 """
-Write "ping\n" to the serial port and wait for its output.
-See tempi-snake/arduino/tempi_snake_arduino_firmware
+Sends/receives to/from a plotter over USB.
 """
-
-# The idea is to send HPGL
-#
-# Query its state:
-# oa;
 
 from twisted.python import log
 from twisted.python import usage
@@ -18,23 +12,30 @@ from twisted.protocols import basic
 import sys
 import os
 
-class StupidProtocol(basic.LineReceiver):
-    #delimiter = "\n"
+class PlotterProtocol(basic.LineReceiver):
+    """
+    Simple protocol to send and receive ASCII to/from a plotter.
+    """
     delimiter = ";"
     bufferSize = 1 # XXX
 
     def lineReceived(self, line):
-        #line = line.strip("\n")
-        if line == "pong":
-            log.msg("Received pong!");
-        elif line == "hello":
-            log.msg("Received hello!");
-        elif line.startswith == "error":
-            log.msg("Received error: %s" % (line));
-        else:
-            log.msg("Received: \"%s\"" % (line))
+        log.msg("Received: \"%s\"" % (line))
 
+def slowly_write(serial_port, text):
+    def _later(new_text):
+        serial_port.write(new_text)
+        new_text = new_text[1:]
+        if len(new_text) == 0:
+            log.msg("done writing")
+        else:
+            reactor.callLater(0.2, _later, new_text)
+    _later(text)
+    
 class Options(usage.Options):
+    """
+    Command line options for this program
+    """
     optFlags = [
         ["verbose", "v", "Print many info"],
     ]
@@ -46,17 +47,24 @@ class Options(usage.Options):
     ]
 
 def query_output_actual_point(serial_port):
+    """
+    Sends OA;
+    """
     log.msg("Write OA;")
     s.write("OA;")
     return defer.succeed(None)
 
 def send_file_contents(serial_port, file_name):
+    """
+    Sends the contents of a file.
+    """
     if os.path.isfile(file_name):
         if os.access(file_name, os.R_OK):
             log.msg("Write file contents from %s" % (file_name))
             with open(file_name, "rU") as f:
                 contents = f.read()
-                s.write(contents)
+                slowly_write(s, contents)
+                # s.write(contents)
                 return defer.succeed(None)
         else:
             log.msg("File is not readable: %s" % (file_name))
@@ -67,8 +75,10 @@ def send_file_contents(serial_port, file_name):
 
 if __name__ == '__main__':
     options = Options()
+    # defaults
     baudrate = 9600
     filename = None
+    port = None
     try:
         options.parseOptions()
     except usage.UsageError, errortext:
@@ -94,9 +104,8 @@ if __name__ == '__main__':
     port = options.opts["port"]
 
     # Open it
-    log.msg("Attempting to open %s at %dbps as a %s device" % (port, baudrate, StupidProtocol.__name__))
-    s = SerialPort(StupidProtocol(), options.opts['port'], reactor, baudrate=baudrate)
-
+    log.msg("Attempting to open %s at %dbps as a %s device" % (port, baudrate, PlotterProtocol.__name__))
+    s = SerialPort(PlotterProtocol(), port, reactor, baudrate=baudrate)
 
     if filename is None:
         log.msg("No file name provided.")
