@@ -12,16 +12,19 @@ See tempi-snake/arduino/tempi_snake_arduino_firmware
 from twisted.python import log
 from twisted.python import usage
 from twisted.internet import reactor
+from twisted.internet import defer
 from twisted.internet.serialport import SerialPort
 from twisted.protocols import basic
 import sys
 import os
 
 class StupidProtocol(basic.LineReceiver):
-    delimiter = "\n"
+    #delimiter = "\n"
+    delimiter = ";"
+    bufferSize = 1 # XXX
 
     def lineReceived(self, line):
-        line = line.strip("\n")
+        #line = line.strip("\n")
         if line == "pong":
             log.msg("Received pong!");
         elif line == "hello":
@@ -41,6 +44,26 @@ class Options(usage.Options):
         ["file", "f", None, "File name to read the HPGL from."],
         ["port", "p", '/dev/ttyACM0', "Serial Port device"],
     ]
+
+def query_output_actual_point(serial_port):
+    log.msg("Write OA;")
+    s.write("OA;")
+    return defer.succeed(None)
+
+def send_file_contents(serial_port, file_name):
+    if os.path.isfile(file_name):
+        if os.access(file_name, os.R_OK):
+            log.msg("Write file contents from %s" % (file_name))
+            with open(file_name, "rU") as f:
+                contents = f.read()
+                s.write(contents)
+                return defer.succeed(None)
+        else:
+            log.msg("File is not readable: %s" % (file_name))
+            return defer.fail(RuntimeError("File is not readable"))
+    else:
+        log.msg("File does not exist: %s" % (file_name))
+        return defer.fail(RuntimeError("File does not exist"))
 
 if __name__ == '__main__':
     options = Options()
@@ -74,19 +97,15 @@ if __name__ == '__main__':
     log.msg("Attempting to open %s at %dbps as a %s device" % (port, baudrate, StupidProtocol.__name__))
     s = SerialPort(StupidProtocol(), options.opts['port'], reactor, baudrate=baudrate)
 
-    def _send_file_contents(file_name, serial_port):
-        log.msg("Write file contents from %s" % (file_name))
-        with open(file_name, "rU") as f:
-            contents = f.read()
-            s.write(contents)
 
     if filename is None:
         log.msg("No file name provided.")
     else:
         if os.path.isfile(filename) and os.access(filename, os.R_OK):
-            reactor.callLater(0.0, _send_file_contents, filename, s)
+            reactor.callLater(0.0, send_file_contents, s, filename)
         else:
             log.msg("File does not exist or is not readable: %s" % (filename))
 
+    reactor.callLater(0.0, query_output_actual_point, s)
     reactor.run()
 
