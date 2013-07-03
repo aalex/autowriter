@@ -24,12 +24,14 @@ class PlotterProtocol(basic.LineReceiver):
 
 def slowly_write(serial_port, text):
     def _later(new_text):
-        serial_port.write(new_text)
+        c = new_text[0:1]
+        log.msg("writing %s" % (c))
+        serial_port.write(c)
         new_text = new_text[1:]
         if len(new_text) == 0:
             log.msg("done writing")
         else:
-            reactor.callLater(0.2, _later, new_text)
+            reactor.callLater(0.01, _later, new_text)
     _later(text)
     
 class Options(usage.Options):
@@ -115,6 +117,6 @@ if __name__ == '__main__':
         else:
             log.msg("File does not exist or is not readable: %s" % (filename))
 
-    reactor.callLater(0.0, query_output_actual_point, s)
+    #reactor.callLater(0.0, query_output_actual_point, s)
     reactor.run()
 
