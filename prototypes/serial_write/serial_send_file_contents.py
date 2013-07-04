@@ -7,6 +7,7 @@ from twisted.python import log
 from twisted.python import usage
 from twisted.internet import reactor
 from twisted.internet import defer
+from twisted.internet import task
 from twisted.internet.serialport import SerialPort
 from twisted.protocols import basic
 import sys
@@ -22,18 +23,46 @@ class PlotterProtocol(basic.LineReceiver):
     def lineReceived(self, line):
         log.msg("Received: \"%s\"" % (line))
 
-def slowly_write(serial_port, text):
-    def _later(new_text):
-        c = new_text[0:1]
-        log.msg("writing %s" % (c))
-        serial_port.write(c)
-        new_text = new_text[1:]
-        if len(new_text) == 0:
-            log.msg("done writing")
-        else:
-            reactor.callLater(0.01, _later, new_text)
-    _later(text)
+#def slowly_write(serial_port, text):
+#    def _later(new_text):
+#        c = new_text[0:1]
+#        log.msg("writing %s" % (c))
+#        serial_port.write(c)
+#        new_text = new_text[1:]
+#        if len(new_text) == 0:
+#            log.msg("done writing")
+#        else:
+#            reactor.callLater(0.01, _later, new_text)
+#    _later(text)
+
+class Spooler(object):
+    """
+    Writes text one character at a time to a given serial port, waiting between each.
+    Printers and plotters are slow devices.
+    """
+    def __init__(self, serial_port):
+        INTERVAL = 0.01
+        self._serial_port = serial_port
+        self._to_write = ""
+        self._looping_call = task.LoopingCall(self._periodical_write)
+        # Start the task:
+        self._looping_call.start(INTERVAL, True)
     
+    def _periodical_write(self):
+        if self.has_to_write():
+            c = self._to_write[0:1]
+            log.msg("writing %s" % (c))
+            self._serial_port.write(c)
+            self._to_write = self._to_write[1:]
+            if not self.has_to_write():
+                log.msg("done writing")
+
+    def append(self, text):
+        self._to_write += text
+
+    def has_to_write(self):
+        return len(self._to_write) != 0
+
 class Options(usage.Options):
     """
     Command line options for this program
@@ -56,7 +85,7 @@ def query_output_actual_point(serial_port):
     s.write("OA;")
     return defer.succeed(None)
 
-def send_file_contents(serial_port, file_name):
+def send_file_contents(slow_writer, file_name):
     """
     Sends the contents of a file.
     """
@@ -65,7 +94,7 @@ def send_file_contents(serial_port, file_name):
             log.msg("Write file contents from %s" % (file_name))
             with open(file_name, "rU") as f:
                 contents = f.read()
-                slowly_write(s, contents)
+                slow_writer.append(contents)
                 # s.write(contents)
                 return defer.succeed(None)
         else:
@@ -108,12 +137,13 @@ if __name__ == '__main__':
     # Open it
     log.msg("Attempting to open %s at %dbps as a %s device" % (port, baudrate, PlotterProtocol.__name__))
     s = SerialPort(PlotterProtocol(), port, reactor, baudrate=baudrate)
+    writer = Spooler(s)
 
     if filename is None:
         log.msg("No file name provided.")
     else:
         if os.path.isfile(filename) and os.access(filename, os.R_OK):
-            reactor.callLater(0.0, send_file_contents, s, filename)
+            reactor.callLater(0.0, send_file_contents, writer, filename)
         else:
             log.msg("File does not exist or is not readable: %s" % (filename))
 
