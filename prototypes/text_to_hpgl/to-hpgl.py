@@ -90,34 +90,46 @@ def translate_pa(pa_command, translate_x, translate_y):
     pa_command.set_arguments(result_args)
     return pa_command
 
-def run():
-    letter = sys.argv[1] # "X"
-    prefix = "../../fonts/hershey"
-    offset_x = int(sys.argv[2]) # 0
-    offset_y = int(sys.argv[3]) # 0
-
+def draw_character(character, font_dir, offset_x, offset_y):
+    """
+    return: text of the translated HPGL file.
+    param character: utf8 one-character string
+    param font_dir: directory containing the HPGL letters
+    param offset_x: int
+    param offset_i: int
+    """
+    result = ""
     try:
-        file_name = utf8_to_filename(prefix, letter)
-        #print(file_name)
-
+        file_name = utf8_to_filename(font_dir, character)
         open_file = open(file_name, "rU")
         open_file.seek(0)
         hpgl = open_file.read()
         #print(hpgl)
-
         #print("TRANSLATED:")
         tokens = hpgl_split(hpgl)
         for token in tokens:
             command = hpgl_command_to_object(token)
             if command.get_command() == "PA":
                 command = translate_pa(command, offset_x, offset_y)
-                print(str(command), "", "")
+                result += str(command)
             else:
-                print(str(command), "", "")
+                # XXX: weird we have to write this line twice. see 
+                # two lines above
+                result += str(command) 
     except RuntimeError, e:
-        print(e)
+        pass
+        # print(e)
+    return result
 
 if __name__ == "__main__":
-    #usage: ./to-hpgl.py [letter] [offset_x] [offset_y]
-    run()
+    try:
+        letter = sys.argv[1] # "X"
+        offset_x = int(sys.argv[2]) # 0
+        offset_y = int(sys.argv[3]) # 0
+        FONT_DIR = "../../fonts/hershey"
+        result = draw_character(letter, FONT_DIR, offset_x, offset_y)
+        print(result, "", "")
+    except IndexError:
+        print("Usage: ./to-hpgl.py [letter] [offset_x] [offset_y]")
+        sys.exit(1)
 
