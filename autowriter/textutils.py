@@ -7,7 +7,6 @@ Date: July 2013
 
 import textwrap
 
-
 def remove_after_last_period(text):
     sep = "."
     tokens = text.split(sep)
@@ -30,10 +29,10 @@ def remove_before_first_period(text):
                 ret += token + ". "
     return ret.strip()
 
-# TODO: characters_per_line
-# TODO: num_lines
-
 def wrap_text(text, num_lines, characters_per_line):
+    """
+    Return: text containing newlines.
+    """
     lines = textwrap.wrap(text, characters_per_line)
     result = ""
     i = 0

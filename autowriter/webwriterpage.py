@@ -19,6 +19,8 @@ class WebWriterPage(Resource):
 
     def render_GET(self, request):
         text = self._app.generate_text()
+        hpgl = self._app.to_hpgl(text)
+
         return """<html>
             <head>
             <title>autowriter</title>
@@ -39,6 +41,7 @@ class WebWriterPage(Resource):
             <body>
                 <h1>autowriter</h1>
                 <pre>%s</pre>
+                <pre>%s</pre>
             </body>
-            </html>""" % (text)
+            </html>""" % (text, hpgl)
 

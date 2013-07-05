@@ -13,9 +13,13 @@ from autowriter import configuration
 from autowriter import webwriterpage
 from autowriter import markovgenerator
 from autowriter import textutils
+from autowriter import hpgltext
 import textwrap
 
 class Application(object):
+    """
+    Main application.
+    """
     def __init__(self, config_file, web_port=8080):
         self.config = None
         self._text_generator = None
@@ -30,7 +34,7 @@ class Application(object):
         self.config = configuration.Configuration(config_file)
 
     def _setup_text_generator(self):
-        self._text_generator = markovgenerator.MarkovGenerator(self.config.text_files[0])
+        self._text_generator = markovgenerator.MarkovGenerator(self.config.text_file)
 
     def _start_web_server(self, web_port):
         self._web_resource = webwriterpage.WebWriterPage(self)
@@ -45,4 +49,21 @@ class Application(object):
 
         text = self._text_generator.generate(words)
         return textutils.crop_text(text, lines, chars)
+
+    def to_hpgl(self, text):
+        """
+        Converts some text to HPGL.
+        The lines must have the desired length and be separated by newline.
+
+        param text: lines of text
+        return: hpgl to draw it.
+        """
+        # gather config
+        line_height = self.config.line_height
+        char_width = self.config.char_width
+        font_dir = self.config.font_directory
+
+        result = hpgltext.text_to_hpgl(text, font_dir, line_height, char_width)
+        return result
+
 
