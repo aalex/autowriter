@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import os
+import sys
 
 def utf8_to_number(character):
     return ord(unicode(character))
@@ -90,27 +91,33 @@ def translate_pa(pa_command, translate_x, translate_y):
     return pa_command
 
 def run():
-    letter = "X"
+    letter = sys.argv[1] # "X"
     prefix = "../../fonts/hershey"
+    offset_x = int(sys.argv[2]) # 0
+    offset_y = int(sys.argv[3]) # 0
+
     try:
         file_name = utf8_to_filename(prefix, letter)
-        print(file_name)
+        #print(file_name)
 
         open_file = open(file_name, "rU")
         open_file.seek(0)
         hpgl = open_file.read()
-        print(hpgl)
+        #print(hpgl)
 
-        print("TRANSLATED:")
+        #print("TRANSLATED:")
         tokens = hpgl_split(hpgl)
         for token in tokens:
             command = hpgl_command_to_object(token)
             if command.get_command() == "PA":
-                command = translate_pa(command, 10, 10)
-            print(str(command), "", "")
+                command = translate_pa(command, offset_x, offset_y)
+                print(str(command), "", "")
+            else:
+                print(str(command), "", "")
     except RuntimeError, e:
         print(e)
 
 if __name__ == "__main__":
+    #usage: ./to-hpgl.py [letter] [offset_x] [offset_y]
     run()
 
