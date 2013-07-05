@@ -1,6 +1,9 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 Parses and contains the configuration.
+Author: Alexandre Quessy
+Date: July 2013
 """
 
 from xml.dom import minidom

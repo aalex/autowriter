@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Main entry point of the application.
+Author: Alexandre Quessy
+Date: July 2013
 """
 import os
 import sys

@@ -1,5 +1,11 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
+Markov-based pseudo-natural language text generator.
+
+Author: Alexandre Quessy
+Date: July 2013
+
 From http://stackoverflow.com/questions/1150144/generating-random-sentences-from-custom-text-in-pythons-nltk
 
 But I got this::

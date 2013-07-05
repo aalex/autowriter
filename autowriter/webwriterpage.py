@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 """
 Web page.
+Author: Alexandre Quessy
+Date: July 2013
 """
 from twisted.web.resource import Resource
 
 class WebWriterPage(Resource):
     """
-    Renders the Web page for the auto writer.
+    Renders the Web page that show the generated text.
+    The text is generated again each time the user refreshes the Web page.
     """
     isLeaf = True
 

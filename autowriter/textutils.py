@@ -1,4 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+Text utilities. (split lines, etc.)
+Author: Alexandre Quessy
+Date: July 2013
+"""
+
 import textwrap
+
 
 def remove_after_last_period(text):
     sep = "."
