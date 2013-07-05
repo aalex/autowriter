@@ -156,15 +156,20 @@ def draw_character(character, font_dir, offset_x, offset_y):
         # print(e)
     return result
 
-def text_to_hpgl(text, font_dir, line_height, char_width):
-    # do it
+def text_to_hpgl(text, font_dir, line_height, char_width, topleft):
+    """
+    Converts a whole text to HPGL.
+    Ready to send to the plotter.
+    The lines must not be too long.
+    param topleft: int. The first line will be at that height. (Y-axis)
+    """
     result = ""
     num_line = 0
-    offset_y = 0
+    offset_y = topleft
     lines = text.splitlines()
     for line in lines:
         num_line = 0
-        offset_y += line_height # FIXME: the Y coordinate should decrease at each line, not increase
+        offset_y -= line_height # the Y coordinate decrease at each line
         offset_x = 0
         num_letter = 0
         for letter in line:

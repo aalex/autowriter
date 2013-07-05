@@ -32,6 +32,7 @@ class Configuration(object):
         <num_characters_per_line>70</num_characters_per_line>
         <line_height>400</line_height>
         <char_width>300</char_width>
+        <topleft>4000</topleft> <!-- Y-axis coordinate for the first line to be drawn -->
       </writer>
     """
     def __init__(self, config_file):
@@ -44,6 +45,7 @@ class Configuration(object):
         self.num_characters_per_line = 70
         self.line_height = 400
         self.char_width = 300
+        self.topleft = 4000
 
         # Populate them
         self._parse(config_file)
@@ -75,6 +77,10 @@ class Configuration(object):
             log.msg(str(e))
         try:
             self.line_height = int(_get_text(root.getElementsByTagName("line_height")[0].childNodes))
+        except IndexError, e:
+            log.msg(str(e))
+        try:
+            self.topleft = int(_get_text(root.getElementsByTagName("topleft")[0].childNodes))
         except IndexError, e:
             log.msg(str(e))
 

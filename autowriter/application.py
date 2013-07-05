@@ -89,8 +89,9 @@ class Application(object):
         line_height = self.config.line_height
         char_width = self.config.char_width
         font_dir = self.config.font_directory
+        topleft = self.config.topleft
 
-        result = hpgltext.text_to_hpgl(text, font_dir, line_height, char_width)
+        result = hpgltext.text_to_hpgl(text, font_dir, line_height, char_width, topleft)
         return result
 
 

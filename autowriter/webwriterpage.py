@@ -38,11 +38,14 @@ class WebWriterPage(Resource):
             pre {
                 border: 1px #fff;
             }
+            .hpgl {
+                font-size: 10px;
+            }
             </style>
             <body>
                 <h1>autowriter</h1>
                 <pre>%s</pre>
-                <pre>%s</pre>
+                <pre style="hpgl">%s</pre>
             </body>
             </html>""" % (text, hpgl)
         return result
