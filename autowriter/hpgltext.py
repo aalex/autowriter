@@ -11,14 +11,22 @@ import sys
 from twisted.python import log
 
 def utf8_to_number(character):
-    #return ord(chr(character).decode('utf-8'))
     try:
-        utf8_encoded = unichr(character).decode("utf-8")
-        return utf8_encoded
+        return ord(unicode(character))
     except TypeError, e:
         log.msg("Error converting character %s to number: %s " % (character, str(e)))
         return 32 # space
-    #return ord(unicode(character))
+    except UnicodeDecodeError, e:
+        log.msg("Error converting character %s to number: %s " % (character, str(e)))
+        return 32 # space
+    # #return ord(chr(character).decode('utf-8'))
+    # try:
+    #     utf8_encoded = unichr(character).decode("utf-8")
+    #     return utf8_encoded
+    # except TypeError, e:
+    #     log.msg("Error converting character %s to number: %s " % (character, str(e)))
+    #     return 32 # space
+    # #return ord(unicode(character))
 
 def utf8_to_filename(prefix, character):
     EXTENSION = ".hpgl"
@@ -163,6 +171,7 @@ def text_to_hpgl(text, font_dir, line_height, char_width):
             num_letter += 1
             offset_x += char_width
             result += draw_character(letter, font_dir, offset_x, offset_y)
+        result += "\n"
     return result
 
 if __name__ == "__main__":

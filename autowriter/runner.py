@@ -26,14 +26,24 @@ def run():
                         help="Specifies the config file. You can also simply specify the config file as the first argument.")
     parser.add_option("-v", "--verbose", action="store_true", help="Makes the logging output verbose.")
     parser.add_option("-d", "--debug", action="store_true", help="Makes the logging output very verbose.")
+    parser.add_option("-b", "--baud-rate", type="int", help="Specifies the baud rate of the plotter. Default is 9600.")
+    parser.add_option("-p", "--port", type="string", help="Serial port device. Default is /dev/ttyUSB0")
 
     (options, args) = parser.parse_args()
 
     log.startLogging(sys.stdout)
+    DEFAULT_CONFIG_FILE = os.path.expanduser("~/.autowriter")
+    DEFAULT_SERIAL_PORT = "/dev/ttyUSB0"
+    DEFAULT_BAUD_RATE = 9600
+    DEFAULT_WEB_PORT = 8080
+
+    config_file = DEFAULT_CONFIG_FILE
+    baud_rate = DEFAULT_BAUD_RATE
+    serial_port = DEFAULT_SERIAL_PORT
+    web_port = DEFAULT_WEB_PORT
 
     if options.config_file:
         config_file = options.config_file
-    DEFAULT_CONFIG_FILE = os.path.expanduser("~/.autowriter")
     if len(args) == 1 and not options.config_file: 
         config_file = args[0] 
     else:
@@ -45,7 +55,7 @@ def run():
         print(error_message)
         sys.exit(1)
 
-    app = application.Application(config_file)
+    app = application.Application(config_file, serial_port, baud_rate, web_port)
 
     try:
         reactor.run()

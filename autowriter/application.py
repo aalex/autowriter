@@ -9,29 +9,46 @@ import os
 import sys
 from twisted.internet import reactor
 from twisted.web.server import Site
+from twisted.python import log
 from autowriter import configuration
 from autowriter import webwriterpage
 from autowriter import markovgenerator
 from autowriter import textutils
 from autowriter import hpgltext
+from autowriter import plotter
 import textwrap
 
 class Application(object):
     """
     Main application.
     """
-    def __init__(self, config_file, web_port=8080):
+    def __init__(self, config_file, serial_port="/dev/ttyUSB0", baud_rate=9600, web_port=8080):
         self.config = None
         self._text_generator = None
         self._web_factory = None
         self._web_resource = None
+        self._serial_port_manager = None
+        self._spooler = None
+        self._serial_port = serial_port
+        self._baud_rate = baud_rate
+        self._web_port = web_port
 
         self._parse_config_file(config_file)
+        self._setup_plotter()
         self._setup_text_generator()
         self._start_web_server(web_port)
+        self._last_generated_text = ""
 
     def _parse_config_file(self, config_file):
         self.config = configuration.Configuration(config_file)
+
+    def _setup_plotter(self):
+        self._serial_port
+        self._baud_rate
+
+        log.msg("Attempting to open %s at %dbps as a %s device" % (self._serial_port, self._baud_rate, plotter.PlotterProtocol.__name__))
+        self._serial_port_manager = plotter.SerialPort(plotter.PlotterProtocol(), self._serial_port, reactor, baudrate=self._baud_rate)
+        self._spooler = plotter.Spooler(self._serial_port_manager)
 
     def _setup_text_generator(self):
         self._text_generator = markovgenerator.MarkovGenerator(self.config.text_file)
@@ -48,7 +65,17 @@ class Application(object):
         words = lines * chars / CHAR_PER_WORD
 
         text = self._text_generator.generate(words)
-        return textutils.crop_text(text, lines, chars)
+        cropped = textutils.crop_text(text, lines, chars)
+        self._last_generated_text = cropped
+        return cropped
+
+    def plot_last_generated_text(self):
+        if self._last_generated_text != "":
+            hpgl = self.to_hpgl(self._last_generated_text)
+            log.msg("PLOT A LOT OF HPGL NOW!")
+            self._spooler.append(hpgl)
+        else:
+            log.msg("nothing to plot")
 
     def to_hpgl(self, text):
         """
