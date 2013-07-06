@@ -4,7 +4,7 @@ import os
 import sys
 
 def utf8_to_number(character):
-    return ord(unicode(character))
+    return ord(unicode(character, "utf-8"))
 
 def utf8_to_filename(prefix, character):
     EXTENSION = ".hpgl"

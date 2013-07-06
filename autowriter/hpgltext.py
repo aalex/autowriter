@@ -12,12 +12,13 @@ from twisted.python import log
 
 def utf8_to_number(character):
     try:
-        return ord(unicode(character))
+        return ord(unicode(character, "utf-8"))
     except TypeError, e:
         log.msg("Error converting character %s to number: %s " % (character, str(e)))
         return 32 # space
     except UnicodeDecodeError, e:
-        log.msg("Error converting character %s to number: %s " % (character, str(e)))
+        # log.msg("Error converting character %s to number: %s " % (character, str(e)))
+        # return ord(unicode(character, "utf-8"))
         return 32 # space
     # #return ord(chr(character).decode('utf-8'))
     # try:
