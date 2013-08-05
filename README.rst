@@ -4,6 +4,23 @@ Generates random text inspired by some source text files.
 
 Software for an art project by Alexandre Castonguay.
 
+Installation
+------------
+
+Ubuntu/Debian
+~~~~~~~~~~~~~
+
+Do this::
+  
+  sudo apt-get install python-twisted
+
+Fedora
+~~~~~~
+
+Do this::
+  
+  sudo yum install python-twisted
+
 Usage
 -----
 
