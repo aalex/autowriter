@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+import serial
 
 SCRIPTS_DIR = "scripts"
 
@@ -14,5 +15,9 @@ if __name__ == "__main__":
         sys.path.insert(0, d)
         os.environ["PATH"] += ":%s" % (os.path.join(d, SCRIPTS_DIR))
     from autowriter import runner
-    runner.run()
+    try:
+        runner.run()
+    except serial.serialutil.SerialException, e:
+        print("Please plug your Arduino or setup the correct serial file: %s" % str(e))
+        sys.exit(1)
 
