@@ -9,6 +9,7 @@ import os
 import sys
 from twisted.internet import reactor
 from twisted.web.server import Site
+from twisted.internet.serialport import SerialPort
 from twisted.python import log
 from autowriter import configuration
 from autowriter import webwriterpage
@@ -22,7 +23,7 @@ class Application(object):
     """
     Main application.
     """
-    def __init__(self, config_file, serial_port="/dev/ttyUSB0", baud_rate=9600, web_port=8080):
+    def __init__(self, config_file, serial_port, baud_rate, web_port):
         self.config = None
         self._text_generator = None
         self._web_factory = None
@@ -40,25 +41,30 @@ class Application(object):
         self._last_generated_text = ""
 
     def _parse_config_file(self, config_file):
+        log.msg("Parse config file %s" % (config_file))
         self.config = configuration.Configuration(config_file)
+        log.msg("Done parsing config file %s" % (config_file))
 
     def _setup_plotter(self):
         self._serial_port
         self._baud_rate
 
         log.msg("Attempting to open %s at %dbps as a %s device" % (self._serial_port, self._baud_rate, plotter.PlotterProtocol.__name__))
-        self._serial_port_manager = plotter.SerialPort(plotter.PlotterProtocol(), self._serial_port, reactor, baudrate=self._baud_rate)
-        self._spooler = plotter.Spooler(self._serial_port_manager)
+        self._serial_port_manager = SerialPort(plotter.PlotterProtocol(), self._serial_port, reactor, baudrate=self._baud_rate)
+        self._spooler = plotter.kpooler(self._serial_port_manager)
 
     def _setup_text_generator(self):
+        log.msg("setup text generator")
         self._text_generator = markovgenerator.MarkovGenerator(self.config.text_file)
 
     def _start_web_server(self, web_port):
+        log.msg("setup web server")
         self._web_resource = webwriterpage.WebWriterPage(self)
         self._web_factory = Site(self._web_resource)
         reactor.listenTCP(web_port, self._web_factory)
 
     def generate_text(self):
+        log.msg("generate text")
         lines = self.config.num_lines
         chars = self.config.num_characters_per_line
         CHAR_PER_WORD = 4
@@ -93,5 +99,4 @@ class Application(object):
 
         result = hpgltext.text_to_hpgl(text, font_dir, line_height, char_width, topleft)
         return result
-
 

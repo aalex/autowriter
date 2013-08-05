@@ -23,7 +23,7 @@ class PlotterProtocol(basic.LineReceiver):
     bufferSize = 1 # XXX
 
     def lineReceived(self, line):
-        log.msg("Received: \"%s\"" % (line))
+        log.msg("PlotterProtocol: Received: \"%s\"" % (line))
 
 #def slowly_write(serial_port, text):
 #    def _later(new_text):

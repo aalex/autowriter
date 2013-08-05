@@ -32,6 +32,12 @@ Or simply::
 
   ./run
 
+You should be able to get help on the command-line options of this program by running::
+  
+  ./run --help
+
+But... in case it doesn't work, please take a look in the source code at autowriter/runner.py for the command-line options you can use.
+
 Installation
 ------------
 

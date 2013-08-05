@@ -52,13 +52,17 @@ class Configuration(object):
 
     def _parse(self, config_file):
         doc = minidom.parse(config_file)
-        root = doc.getElementsByTagName("writer")[0]
+        try:
+            root = doc.getElementsByTagName("writer")[0]
+        except IndexError, e:
+            log.msg("Configuration._parse(%s): %s" % (config_file, str(e)))
+            return None
 
         # TODO: load more than one text file
         try:
             self.text_file = _get_text(root.getElementsByTagName("text")[0].childNodes)
         except IndexError, e:
-            log.msg(str(e))
+            log.msg("Configuration._parse(%s): %s" % (config_file, str(e)))
         try:
             self.font_directory = _get_text(root.getElementsByTagName("font_directory")[0].childNodes)
         except IndexError, e:

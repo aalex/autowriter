@@ -21,6 +21,7 @@ def run():
     """
     Runs the application.
     """
+    # Setup command-line options:
     parser = OptionParser(usage="%prog [config file] [options]", version="%prog " + autowriter.__version__, description=DESCRIPTION)
     parser.add_option("-f", "--config-file", type="string",
                         help="Specifies the config file. You can also simply specify the config file as the first argument.")
@@ -31,7 +32,9 @@ def run():
 
     (options, args) = parser.parse_args()
 
+    # Load default values:
     log.startLogging(sys.stdout)
+    log.msg("load default option values")
     DEFAULT_CONFIG_FILE = os.path.expanduser("~/.autowriter")
     DEFAULT_SERIAL_PORT = "/dev/ttyUSB0"
     DEFAULT_BAUD_RATE = 9600
@@ -42,6 +45,8 @@ def run():
     serial_port = DEFAULT_SERIAL_PORT
     web_port = DEFAULT_WEB_PORT
 
+    # Update with command-line options:
+    log.msg("Update with command-line options")
     if options.config_file:
         config_file = options.config_file
     if len(args) == 1 and not options.config_file: 
@@ -49,15 +54,19 @@ def run():
     else:
         config_file = DEFAULT_CONFIG_FILE
 
+    # Check for config file:
+    log.msg("Check for config file")
     error_message = None
     if not os.path.exists(config_file):
         error_message = "No such file: %s" % (config_file)
         print(error_message)
         sys.exit(1)
 
+    # Run application:
+    log.msg("Instanciate application")
     app = application.Application(config_file, serial_port, baud_rate, web_port)
-
     try:
+        log.msg("Run the Twisted reactor")
         reactor.run()
     except KeyboardInterrupt:
         reactor.stop()
