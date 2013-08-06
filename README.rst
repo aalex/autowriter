@@ -13,6 +13,7 @@ Ubuntu/Debian
 Do this::
   
   sudo apt-get install python-twisted
+  sudo usermod -a -G dialout odroid
 
 Fedora
 ~~~~~~
