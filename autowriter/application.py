@@ -51,7 +51,7 @@ class Application(object):
 
         log.msg("Attempting to open %s at %dbps as a %s device" % (self._serial_port, self._baud_rate, plotter.PlotterProtocol.__name__))
         self._serial_port_manager = SerialPort(plotter.PlotterProtocol(), self._serial_port, reactor, baudrate=self._baud_rate)
-        self._spooler = plotter.kpooler(self._serial_port_manager)
+        self._spooler = plotter.Spooler(self._serial_port_manager)
 
     def _setup_text_generator(self):
         log.msg("setup text generator")
